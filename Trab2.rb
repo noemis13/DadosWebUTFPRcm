@@ -1,5 +1,11 @@
-Trab2
+$urlCampus
 
+$urlUnot
+$urlPnot
+
+$urlPrimeiraInfo
+$urlSegundaInfo
+$urlTerceiraInfo
 
 class Utfpr
 	#Bibliotecas html nescessárias
@@ -11,6 +17,24 @@ class Utfpr
 	def initialize(url)
 		@hp = Hpricot(open(url))
 	end
+
+#########################################################################
+	def pegaUrlCampus
+		stringCampus = @campus = @hp.at("li[@class=navTreeItem visualNoMarker navTreeFolderish section-o-campus]").inner_html
+		auxCampus = stringCampus.split(/"/)
+		$urlCampus = auxCampus[1]				
+	end	
+
+	def pegaUrlNoticias
+		stringNome = @Not = (@hp/"div/h3").inner_html.gsub(/\n/, '')
+		aux = stringNome.split(/"/)
+		$urlUnot = aux [1]
+		$urlPnot = aux[5]
+		$urlPrimeiraInfo = aux[25]			
+		$urlSegundaInfo = aux[21]
+		$urlTerceiraInfo = aux[17]		
+	end
+#########################################################################	
 
 
 	def endCompletoCampus
@@ -54,68 +78,70 @@ class Utfpr
 	end
 
 #########################################################################
-	
-	def penultimaNoticia	
+	def tituloPnot
 		@pNot = @hp.at("h1[@id='parent-fieldname-title']").inner_text.gsub(/\n/, '')
-	end
-
+	end	
+	
 	def textoPnot
 		@textoPn = @hp.at("div[@id='parent-fieldname-description']").inner_text.gsub(/\n/, '').gsub(/\r/, '   ')
 	end
-
+	
 	def texto2Pnot
-		@textoPn = @hp.at("div[@id='content-core']").inner_text.gsub(/\n/, '').gsub(/\r/, '   ')
+		@texto2Pn = @hp.at("div[@id='parent-fieldname-text']").inner_text.gsub(/\n/, '').gsub(/\r/, '   ')
 	end
+		
+
+
 
 #########################################################################
 
 	def ultimaNoticia
 		@pNot = (@hp/"h3/a").first.inner_text.gsub(/\n/, '')
 	end
-	
-	def textoUnot
-		@textoUn = @hp.at("div[@id='parent-fieldname-text']").inner_text.gsub(/\n/, ' ').gsub(/\r/, '   ')
+
+	def conteudoultimaNot
+		@textoUn = @hp.at("div[@id='parent-fieldname-text']").inner_text.gsub(/\n/, ' ').gsub(/\r/, '    ')	
 	end	
-	
 end
+
+	
 
 #############################MAIN########################################
 
 u = Utfpr.new("http://www.utfpr.edu.br/campomourao")
 
-campus = Utfpr.new("http://www.utfpr.edu.br/campomourao/o-campus")
-
-terceiraInfo = Utfpr.new("http://www.utfpr.edu.br/campomourao/estrutura-universitaria/assessorias/ascom/noticias/ultimas-noticias-1/cursos-de-formacao-de-auditor-interno-iso-9001-2015-e-de-interpretacao-da-norma-iso-9001-2015-na-utfpr-cm")
-
-segundaInfo = Utfpr.new("http://www.utfpr.edu.br/campomourao/estrutura-universitaria/assessorias/ascom/noticias/ultimas-noticias-1/inscricoes-para-iii-fetamut")
-
-primeiraInfo = Utfpr.new("http://www.utfpr.edu.br/campomourao/estrutura-universitaria/assessorias/ascom/noticias/ultimas-noticias-1/programa-brafitec-capes-2016")
-
-pNoticia = Utfpr.new("http://www.utfpr.edu.br/campomourao/estrutura-universitaria/assessorias/ascom/noticias/ultimas-noticias-1/evento-internacional-no-chile")
-
-uNoticia = Utfpr.new("http://www.utfpr.edu.br/campomourao/estrutura-universitaria/assessorias/ascom/noticias/ultimas-noticias-1/divulgacao-da-programacao-durante-visita-da-comitiva-portuguesa-ao-campus")
 
 ########TENSTANDO#########
+u.pegaUrlCampus
+u.pegaUrlNoticias
 
-=begin
-=end
 p u.endCompletoCampus
-p campus.textoDeApresentacaoCampus 
 
-p primeiraInfo.primeiraInfoInsti 
-p primeiraInfo.conteudoPrimeiraInfo 
+campus = Utfpr.new($urlCampus)
+puts campus.textoDeApresentacaoCampus
 
-p segundaInfo.segundaInfoInsti 
-p segundaInfo.conteudoSegundaInfo 
+tNoticiaInfo = Utfpr.new($urlTerceiraInfo)
+puts tNoticiaInfo.terceiraInfoInsti
+puts tNoticiaInfo.conteudoTerceiraInfo
 
-p terceiraInfo.terceiraInfoInsti 
-p terceiraInfo.conteudoTerceiraInfo 
 
-p pNoticia.penultimaNoticia
-p pNoticia.textoPnot
-p pNoticia.texto2Pnot
+sNoticiaInfo = Utfpr.new($urlSegundaInfo) #instancia classe com link dinamicamente
+puts sNoticiaInfo.segundaInfoInsti
+puts sNoticiaInfo.conteudoSegundaInfo
 
-p u.ultimaNoticia
-p uNoticia.textoUnot
-=begin
-=end
+
+tNoticiaInfo = Utfpr.new($urlPrimeiraInfo) #New na classe com o link dinâmico
+puts tNoticiaInfo.primeiraInfoInsti 
+puts tNoticiaInfo.conteudoPrimeiraInfo 
+
+
+pNoticia = Utfpr.new ($urlPnot) #Instancia a classe com o link dinamico
+puts pNoticia.tituloPnot
+puts pNoticia.textoPnot #Mostra o conteudo da noticia
+puts pNoticia.texto2Pnot
+
+	
+uNoticia = Utfpr.new($urlUnot)
+puts u.ultimaNoticia
+puts uNoticia.conteudoultimaNot
+
